@@ -4,8 +4,6 @@
 		{{ $ts.showFeaturedNotesInTimeline }}
 	</FormSwitch>
 
-	<FormSwitch v-model:value="reportError">{{ $ts.sendErrorReports }}<template #desc>{{ $ts.sendErrorReportsDescription }}</template></FormSwitch>
-
 	<FormLink to="/settings/account-info">{{ $ts.accountInfo }}</FormLink>
 	<FormLink to="/settings/experimental-features">{{ $ts.experimentalFeatures }}</FormLink>
 
@@ -33,7 +31,6 @@ import FormGroup from '@/components/form/group.vue';
 import FormButton from '@/components/form/button.vue';
 import * as os from '@/os';
 import { debug } from '@/config';
-import { defaultStore } from '@/store';
 
 export default defineComponent({
 	components: {
@@ -55,10 +52,6 @@ export default defineComponent({
 			},
 			debug
 		}
-	},
-
-	computed: {
-		reportError: defaultStore.makeGetterSetter('reportError'),
 	},
 
 	mounted() {

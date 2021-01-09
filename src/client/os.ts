@@ -1,13 +1,11 @@
 import { Component, defineAsyncComponent, markRaw, reactive, Ref, ref } from 'vue';
 import { EventEmitter } from 'eventemitter3';
-import * as Sentry from '@sentry/browser';
 import Stream from '@/scripts/stream';
 import { apiUrl, debug } from '@/config';
 import MkPostFormDialog from '@/components/post-form-dialog.vue';
 import MkWaitingDialog from '@/components/waiting-dialog.vue';
 import { resolve } from '@/router';
-import { $i } from '@/account';
-import { defaultStore } from '@/store';
+import { $i } from './account';
 
 const ua = navigator.userAgent.toLowerCase();
 export const isMobile = /mobile|iphone|ipad|android/.test(ua);
@@ -56,32 +54,19 @@ export function api(endpoint: string, data: Record<string, any> = {}, token?: st
 			if (res.status === 200) {
 				resolve(body);
 				if (debug) {
-					log!.res = markRaw(body);
-					log!.state = 'success';
+					log.res = markRaw(body);
+					log.state = 'success';
 				}
 			} else if (res.status === 204) {
 				resolve();
 				if (debug) {
-					log!.state = 'success';
+					log.state = 'success';
 				}
 			} else {
 				reject(body.error);
 				if (debug) {
-					log!.res = markRaw(body.error);
-					log!.state = 'failed';
-				}
-
-				if (defaultStore.state.reportError && !_DEV_) {
-					Sentry.withScope((scope) => {
-						scope.setTag('api_endpoint', endpoint);
-						scope.setContext('api params', data);
-						scope.setContext('api error info', body.info);
-						scope.setTag('api_error_id', body.id);
-						scope.setTag('api_error_code', body.code);
-						scope.setTag('api_error_kind', body.kind);
-						scope.setLevel(Sentry.Severity.Error);
-						Sentry.captureMessage('API error');
-					});
+					log.res = markRaw(body.error);
+					log.state = 'failed';
 				}
 			}
 		}).catch(reject);
