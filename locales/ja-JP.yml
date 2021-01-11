@@ -677,6 +677,12 @@ clearCache: "キャッシュをクリア"
 onlineUsersCount: "{n}人がオンライン"
 nUsers: "{n}ユーザー"
 nNotes: "{n}ノート"
+myTheme: "マイテーマ"
+backgroundColor: "背景"
+accentColor: "アクセント"
+textColor: "文字"
+saveAs: "名前を付けて保存"
+advanced: "高度"
 
 _aboutMisskey:
   about: "Misskeyはsyuiloによって2014年から開発されている、オープンソースのソフトウェアです。"
