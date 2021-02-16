@@ -24,25 +24,25 @@
 				</div>
 			</div>
 			<div class="container" v-if="lists">
-				<div class="header">{{ $ts.lists }}</div>
+				<div class="header">{{ $ts.lists }}<button class="_button add"><Fa :icon="faPlus"/></button></div>
 				<div class="body">
 					<MkA v-for="list in lists" :key="list.id" :to="`/my/list/${ list.id }`" class="item" :class="{ active: tl === `list:${ list.id }` }"><Fa :icon="faListUl" class="icon"/>{{ list.name }}</MkA>
 				</div>
 			</div>
 			<div class="container" v-if="antennas">
-				<div class="header">{{ $ts.antennas }}</div>
+				<div class="header">{{ $ts.antennas }}<button class="_button add"><Fa :icon="faPlus"/></button></div>
 				<div class="body">
 					<MkA v-for="antenna in antennas" :key="antenna.id" :to="`/my/antenna/${ antenna.id }`" class="item" :class="{ active: tl === `antenna:${ antenna.id }` }"><Fa :icon="faSatellite" class="icon"/>{{ antenna.name }}</MkA>
 				</div>
 			</div>
 			<div class="container" v-if="followedChannels">
-				<div class="header">{{ $ts.channel }}</div>
+				<div class="header">{{ $ts.channel }}<button class="_button add"><Fa :icon="faPlus"/></button></div>
 				<div class="body">
 					<MkA v-for="channel in followedChannels" :key="channel.id" :to="`/channels/${ channel.id }`" class="item" :class="{ active: tl === `channel:${ channel.id }`, read: !channel.hasUnreadNote }"><Fa :icon="faSatelliteDish" class="icon"/>{{ channel.name }}</MkA>
 				</div>
 			</div>
 			<div class="container" v-if="featuredChannels">
-				<div class="header">{{ $ts.channel }}</div>
+				<div class="header">{{ $ts.channel }}<button class="_button add"><Fa :icon="faPlus"/></button></div>
 				<div class="body">
 					<MkA v-for="channel in featuredChannels" :key="channel.id" :to="`/channels/${ channel.id }`" class="item" :class="{ active: tl === `channel:${ channel.id }` }"><Fa :icon="faSatelliteDish" class="icon"/>{{ channel.name }}</MkA>
 				</div>
@@ -62,21 +62,35 @@
 
 	<main class="main" @contextmenu.stop="onContextmenu">
 		<header class="header" ref="header" @click="onHeaderClick">
-			<div v-if="tl === 'home'">
-				<Fa :icon="faHome" class="icon"/>
-				<div class="title">{{ $ts._timelines.home }}</div>
+			<div class="left">
+				<template v-if="tl === 'home'">
+					<Fa :icon="faHome" class="icon"/>
+					<div class="title">{{ $ts._timelines.home }}</div>
+				</template>
+				<template v-else-if="tl === 'local'">
+					<Fa :icon="faShareAlt" class="icon"/>
+					<div class="title">{{ $ts._timelines.local }}</div>
+				</template>
+				<template v-else-if="tl === 'social'">
+					<Fa :icon="faShareAlt" class="icon"/>
+					<div class="title">{{ $ts._timelines.social }}</div>
+				</template>
+				<template v-else-if="tl === 'global'">
+					<Fa :icon="faShareAlt" class="icon"/>
+					<div class="title">{{ $ts._timelines.global }}</div>
+				</template>
+				<template v-else-if="tl.startsWith('channel:')">
+					<Fa :icon="faSatelliteDish" class="icon"/>
+					<div class="title" v-if="currentChannel">{{ currentChannel.name }}</div>
+					<div class="description" v-if="currentChannel">{{ currentChannel.description }}</div>
+				</template>
 			</div>
-			<div v-else-if="tl === 'local'">
-				<Fa :icon="faShareAlt" class="icon"/>
-				<div class="title">{{ $ts._timelines.local }}</div>
-			</div>
-			<div v-else-if="tl === 'social'">
-				<Fa :icon="faShareAlt" class="icon"/>
-				<div class="title">{{ $ts._timelines.social }}</div>
-			</div>
-			<div v-else-if="tl === 'global'">
-				<Fa :icon="faShareAlt" class="icon"/>
-				<div class="title">{{ $ts._timelines.global }}</div>
+
+			<div class="right">
+				<XHeaderClock/>
+				<button class="_button search">
+					<Fa :icon="faSearch"/>
+				</button>
 			</div>
 		</header>
 		<div class="body">
@@ -97,7 +111,7 @@
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent } from 'vue';
-import { faLayerGroup, faBars, faHome, faCircle, faWindowMaximize, faColumns, faPencilAlt, faShareAlt, faSatelliteDish, faListUl, faSatellite, faCog } from '@fortawesome/free-solid-svg-icons';
+import { faLayerGroup, faBars, faHome, faCircle, faWindowMaximize, faColumns, faPencilAlt, faShareAlt, faSatelliteDish, faListUl, faSatellite, faCog, faSearch, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { faBell } from '@fortawesome/free-regular-svg-icons';
 import { instanceName } from '@/config';
 import XSidebar from '@/components/sidebar.vue';
@@ -105,6 +119,7 @@ import XCommon from '../_common_/common.vue';
 import XSide from './side.vue';
 import XTimeline from './timeline.vue';
 import XPostForm from './post-form.vue';
+import XHeaderClock from './header-clock.vue';
 import * as os from '@/os';
 import { sidebarDef } from '@/sidebar';
 
@@ -115,6 +130,7 @@ export default defineComponent({
 		XSide, // NOTE: dynamic importするとAsyncComponentWrapperが間に入るせいでref取得できなくて面倒になる
 		XTimeline,
 		XPostForm,
+		XHeaderClock,
 	},
 
 	provide() {
@@ -149,8 +165,9 @@ export default defineComponent({
 			antennas: null,
 			followedChannels: null,
 			featuredChannels: null,
+			currentChannel: null,
 			menuDef: sidebarDef,
-			faLayerGroup, faBars, faBell, faHome, faCircle, faPencilAlt, faShareAlt, faSatelliteDish, faListUl, faSatellite, faCog,
+			faLayerGroup, faBars, faBell, faHome, faCircle, faPencilAlt, faShareAlt, faSatelliteDish, faListUl, faSatellite, faCog, faSearch, faPlus,
 		};
 	},
 
@@ -170,6 +187,14 @@ export default defineComponent({
 		os.api('channels/featured').then(channels => {
 			this.featuredChannels = channels;
 		});
+
+		this.$watch('tl', () => {
+			if (this.tl.startsWith('channel:')) {
+				os.api('channels/show', { channelId: this.tl.replace('channel:', '') }).then(channel => {
+					this.currentChannel = channel;
+				});
+			}
+		}, { immediate: true });
 	},
 
 	methods: {
@@ -260,6 +285,29 @@ export default defineComponent({
 				border-top: solid 1px var(--divider);
 			}
 
+			> .left, > .right {
+				> .item, > .menu {
+					height: ($header-height - ($padding * 2));
+					width: ($header-height - ($padding * 2));
+					padding: 10px;
+					box-sizing: border-box;
+					margin-right: 4px;
+					//opacity: 0.6;
+					position: relative;
+					line-height: initial;
+
+					> i {
+						position: absolute;
+						top: 8px;
+						right: 8px;
+						color: var(--indicator);
+						font-size: 8px;
+						line-height: 8px;
+						animation: blink 1s infinite;
+					}
+				}
+			}
+
 			> .left {
 				> .account {
 					display: flex;
@@ -276,32 +324,13 @@ export default defineComponent({
 
 			> .right {
 				margin-left: auto;
-
-				> .item {
-					height: ($header-height - ($padding * 2));
-					width: ($header-height - ($padding * 2));
-					padding: 10px;
-					box-sizing: border-box;
-					margin-right: 4px;
-					//opacity: 0.6;
-					position: relative;
-
-					> i {
-						position: absolute;
-						top: 8px;
-						right: 8px;
-						color: var(--indicator);
-						font-size: 8px;
-						line-height: 8px;
-						animation: blink 1s infinite;
-					}
-				}
 			}
 		}
 
 		> .body {
 			flex: 1;
 			min-width: 0;
+			padding: 8px 0;
 			overflow: auto;
 
 			> .container {
@@ -310,9 +339,14 @@ export default defineComponent({
 				}
 
 				> .header {
+					display: flex;
 					font-size: 0.9em;
 					padding: 8px 16px;
 					opacity: 0.7;
+
+					> .add {
+						margin-left: auto;
+					}
 				}
 
 				> .body {
@@ -338,7 +372,7 @@ export default defineComponent({
 						}
 
 						> .icon {
-							margin-right: 6px;
+							margin-right: 8px;
 							opacity: 0.6;
 						}
 					}
@@ -358,18 +392,20 @@ export default defineComponent({
 
 		> .header {
 			$padding: 8px;
+			display: flex;
 			z-index: 1000;
 			height: $header-height;
 			padding: $padding;
 			box-sizing: border-box;
 			line-height: ($header-height - ($padding * 2));
-			font-weight: bold;
 			background-color: var(--panel);
 			border-bottom: solid 1px var(--divider);
 			user-select: none;
 
-			> div {
+			> .left {
 				display: flex;
+				flex: 1;
+				min-width: 0;
 
 				> .icon {
 					height: ($header-height - ($padding * 2));
@@ -379,11 +415,51 @@ export default defineComponent({
 					margin-right: 4px;
 					opacity: 0.6;
 				}
+
+				> .title, > .description {
+					overflow: hidden;
+					text-overflow: ellipsis;
+					white-space: nowrap;
+					min-width: 0;
+				}
+
+				> .title {
+					flex-shrink: 0;
+					font-weight: bold;
+				}
+
+				> .description {
+					margin-left: 16px;
+					opacity: 0.7;
+					font-size: 0.9em;
+				}
+			}
+
+			> .right {
+				display: flex;
+				min-width: 0;
+				margin-left: auto;
+				padding-left: 8px;
+
+				> .search {
+					height: ($header-height - ($padding * 2));
+					width: ($header-height - ($padding * 2));
+					padding: 10px;
+					box-sizing: border-box;
+					margin-left: 8px;
+					position: relative;
+					line-height: initial;
+					border-radius: 5px;
+
+					&:hover {
+						background: rgba(0, 0, 0, 0.05);
+					}
+				}
 			}
 		}
 
 		> .footer {
-			padding: 16px;
+			padding: 0 16px 16px 16px;
 		}
 
 		> .body {
