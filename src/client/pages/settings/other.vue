@@ -38,6 +38,7 @@ import * as os from '@/os';
 import { debug } from '@/config';
 import { defaultStore } from '@/store';
 import { signout } from '@/account';
+import { unisonReload } from '@/scripts/unison-reload';
 
 export default defineComponent({
 	components: {
@@ -70,7 +71,7 @@ export default defineComponent({
 		changeDebug(v) {
 			console.log(v);
 			localStorage.setItem('debug', v.toString());
-			location.reload();
+			unisonReload();
 		},
 
 		onChangeInjectFeaturedNote(v) {

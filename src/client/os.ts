@@ -7,9 +7,6 @@ import MkWaitingDialog from '@/components/waiting-dialog.vue';
 import { resolve } from '@/router';
 import { $i } from './account';
 
-const ua = navigator.userAgent.toLowerCase();
-export const isMobile = /mobile|iphone|ipad|android/.test(ua);
-
 export const stream = markRaw(new Stream());
 
 export const pendingApiRequestsCount = ref(0);

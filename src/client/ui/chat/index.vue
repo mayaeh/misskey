@@ -6,11 +6,14 @@
 		<header class="header">
 			<div class="left">
 				<button class="_button account" @click="openAccountMenu">
-					<MkAvatar :user="$i" class="avatar"/><MkAcct class="text" :user="$i"/>
+					<MkAvatar :user="$i" class="avatar"/><!--<MkAcct class="text" :user="$i"/>-->
 				</button>
 			</div>
 			<div class="right">
-				<MkA class="item" to="/my/notifications"><Fa :icon="faBell"/><i v-if="$i.hasUnreadNotification"><Fa :icon="faCircle"/></i></MkA>
+				<MkA class="item" to="/my/messaging" v-tooltip="$ts.messaging"><Fa class="icon" :icon="faComments"/><i v-if="$i.hasUnreadMessagingMessage"><Fa :icon="faCircle"/></i></MkA>
+				<MkA class="item" to="/my/messages" v-tooltip="$ts.directNotes"><Fa class="icon" :icon="faEnvelope"/><i v-if="$i.hasUnreadSpecifiedNotes"><Fa :icon="faCircle"/></i></MkA>
+				<MkA class="item" to="/my/mentions" v-tooltip="$ts.mentions"><Fa class="icon" :icon="faAt"/><i v-if="$i.hasUnreadMentions"><Fa :icon="faCircle"/></i></MkA>
+				<MkA class="item" to="/my/notifications" v-tooltip="$ts.notifications"><Fa class="icon" :icon="faBell"/><i v-if="$i.hasUnreadNotification"><Fa :icon="faCircle"/></i></MkA>
 			</div>
 		</header>
 		<div class="body">
@@ -18,44 +21,52 @@
 				<div class="header">{{ $ts.timeline }}</div>
 				<div class="body">
 					<MkA to="/timeline/home" class="item" :class="{ active: tl === 'home' }"><Fa :icon="faHome" class="icon"/>{{ $ts._timelines.home }}</MkA>
-					<MkA to="/timeline/local" class="item" :class="{ active: tl === 'local' }"><Fa :icon="faHome" class="icon"/>{{ $ts._timelines.local }}</MkA>
-					<MkA to="/timeline/social" class="item" :class="{ active: tl === 'social' }"><Fa :icon="faHome" class="icon"/>{{ $ts._timelines.social }}</MkA>
-					<MkA to="/timeline/global" class="item" :class="{ active: tl === 'global' }"><Fa :icon="faHome" class="icon"/>{{ $ts._timelines.global }}</MkA>
-				</div>
-			</div>
-			<div class="container" v-if="lists">
-				<div class="header">{{ $ts.lists }}<button class="_button add"><Fa :icon="faPlus"/></button></div>
-				<div class="body">
-					<MkA v-for="list in lists" :key="list.id" :to="`/my/list/${ list.id }`" class="item" :class="{ active: tl === `list:${ list.id }` }"><Fa :icon="faListUl" class="icon"/>{{ list.name }}</MkA>
-				</div>
-			</div>
-			<div class="container" v-if="antennas">
-				<div class="header">{{ $ts.antennas }}<button class="_button add"><Fa :icon="faPlus"/></button></div>
-				<div class="body">
-					<MkA v-for="antenna in antennas" :key="antenna.id" :to="`/my/antenna/${ antenna.id }`" class="item" :class="{ active: tl === `antenna:${ antenna.id }` }"><Fa :icon="faSatellite" class="icon"/>{{ antenna.name }}</MkA>
+					<MkA to="/timeline/local" class="item" :class="{ active: tl === 'local' }"><Fa :icon="faComments" class="icon"/>{{ $ts._timelines.local }}</MkA>
+					<MkA to="/timeline/social" class="item" :class="{ active: tl === 'social' }"><Fa :icon="faShareAlt" class="icon"/>{{ $ts._timelines.social }}</MkA>
+					<MkA to="/timeline/global" class="item" :class="{ active: tl === 'global' }"><Fa :icon="faGlobe" class="icon"/>{{ $ts._timelines.global }}</MkA>
 				</div>
 			</div>
 			<div class="container" v-if="followedChannels">
-				<div class="header">{{ $ts.channel }}<button class="_button add"><Fa :icon="faPlus"/></button></div>
+				<div class="header">{{ $ts.channel }} ({{ $ts.following }})<button class="_button add" @click="addChannel"><Fa :icon="faPlus"/></button></div>
 				<div class="body">
 					<MkA v-for="channel in followedChannels" :key="channel.id" :to="`/channels/${ channel.id }`" class="item" :class="{ active: tl === `channel:${ channel.id }`, read: !channel.hasUnreadNote }"><Fa :icon="faSatelliteDish" class="icon"/>{{ channel.name }}</MkA>
 				</div>
 			</div>
 			<div class="container" v-if="featuredChannels">
-				<div class="header">{{ $ts.channel }}<button class="_button add"><Fa :icon="faPlus"/></button></div>
+				<div class="header">{{ $ts.channel }}<button class="_button add" @click="addChannel"><Fa :icon="faPlus"/></button></div>
 				<div class="body">
 					<MkA v-for="channel in featuredChannels" :key="channel.id" :to="`/channels/${ channel.id }`" class="item" :class="{ active: tl === `channel:${ channel.id }` }"><Fa :icon="faSatelliteDish" class="icon"/>{{ channel.name }}</MkA>
+				</div>
+			</div>
+			<div class="container" v-if="lists">
+				<div class="header">{{ $ts.lists }}<button class="_button add" @click="addList"><Fa :icon="faPlus"/></button></div>
+				<div class="body">
+					<MkA v-for="list in lists" :key="list.id" :to="`/my/list/${ list.id }`" class="item" :class="{ active: tl === `list:${ list.id }` }"><Fa :icon="faListUl" class="icon"/>{{ list.name }}</MkA>
+				</div>
+			</div>
+			<div class="container" v-if="antennas">
+				<div class="header">{{ $ts.antennas }}<button class="_button add" @click="addAntenna"><Fa :icon="faPlus"/></button></div>
+				<div class="body">
+					<MkA v-for="antenna in antennas" :key="antenna.id" :to="`/my/antenna/${ antenna.id }`" class="item" :class="{ active: tl === `antenna:${ antenna.id }` }"><Fa :icon="faSatellite" class="icon"/>{{ antenna.name }}</MkA>
+				</div>
+			</div>
+			<div class="container">
+				<div class="body">
+					<MkA to="/my/favorites" class="item"><Fa :icon="faStar" class="icon"/>{{ $ts.favorites }}</MkA>
 				</div>
 			</div>
 		</div>
 		<footer class="footer">
 			<div class="left">
 				<button class="_button menu" @click="showMenu">
-					<Fa :icon="faBars"/>
+					<Fa class="icon" :icon="faBars"/>
 				</button>
 			</div>
 			<div class="right">
-				<MkA class="item" to="/settings"><Fa :icon="faCog"/></MkA>
+				<button class="_button item search" @click="search" v-tooltip="$ts.search">
+					<Fa :icon="faSearch"/>
+				</button>
+				<MkA class="item" to="/settings" v-tooltip="$ts.settings"><Fa class="icon" :icon="faCog"/></MkA>
 			</div>
 		</footer>
 	</div>
@@ -68,7 +79,7 @@
 					<div class="title">{{ $ts._timelines.home }}</div>
 				</template>
 				<template v-else-if="tl === 'local'">
-					<Fa :icon="faShareAlt" class="icon"/>
+					<Fa :icon="faComments" class="icon"/>
 					<div class="title">{{ $ts._timelines.local }}</div>
 				</template>
 				<template v-else-if="tl === 'social'">
@@ -76,34 +87,45 @@
 					<div class="title">{{ $ts._timelines.social }}</div>
 				</template>
 				<template v-else-if="tl === 'global'">
-					<Fa :icon="faShareAlt" class="icon"/>
+					<Fa :icon="faGlobe" class="icon"/>
 					<div class="title">{{ $ts._timelines.global }}</div>
 				</template>
 				<template v-else-if="tl.startsWith('channel:')">
 					<Fa :icon="faSatelliteDish" class="icon"/>
-					<div class="title" v-if="currentChannel">{{ currentChannel.name }}</div>
-					<div class="description" v-if="currentChannel">{{ currentChannel.description }}</div>
+					<div class="title" v-if="currentChannel">{{ currentChannel.name }}<div class="description">{{ currentChannel.description }}</div></div>
 				</template>
 			</div>
 
 			<div class="right">
-				<XHeaderClock/>
-				<button class="_button search">
+				<div class="instance">{{ instanceName }}</div>
+				<XHeaderClock class="clock"/>
+				<button class="_button button timetravel" @click="timetravel" v-tooltip="$ts.jumpToSpecifiedDate">
+					<Fa :icon="faCalendarAlt"/>
+				</button>
+				<button class="_button button search" v-if="tl.startsWith('channel:') && currentChannel" @click="inChannelSearch" v-tooltip="$ts.inChannelSearch">
 					<Fa :icon="faSearch"/>
+				</button>
+				<button class="_button button search" v-else @click="search" v-tooltip="$ts.search">
+					<Fa :icon="faSearch"/>
+				</button>
+				<button class="_button button follow" v-if="tl.startsWith('channel:') && currentChannel" :class="{ followed: currentChannel.isFollowing }" @click="toggleChannelFollow" v-tooltip="currentChannel.isFollowing ? $ts.unfollow : $ts.follow">
+					<Fa v-if="currentChannel.isFollowing" :icon="faStar"/>
+					<Fa v-else :icon="farStar"/>
+				</button>
+				<button class="_button button menu" v-if="tl.startsWith('channel:') && currentChannel" @click="openChannelMenu">
+					<Fa :icon="faEllipsisH"/>
 				</button>
 			</div>
 		</header>
-		<div class="body">
-			<XTimeline v-if="tl.startsWith('channel:')" src="channel" :key="tl" :channel="tl.replace('channel:', '')"/>
-			<XTimeline v-else :src="tl" :key="tl"/>
-		</div>
-		<footer class="footer">
-			<XPostForm v-if="tl.startsWith('channel:')" :key="tl" :channel="tl.replace('channel:', '')"/>
-			<XPostForm v-else/>
-		</footer>
+
+		<XTimeline class="body" ref="tl" v-if="tl.startsWith('channel:')" src="channel" :key="tl" :channel="tl.replace('channel:', '')"/>
+		<XTimeline class="body" ref="tl" v-else :src="tl" :key="tl"/>
 	</main>
 
-	<XSide class="side" ref="side"/>
+	<XSide class="side" ref="side" @open="sideViewOpening = true" @close="sideViewOpening = false"/>
+	<div class="side widgets" :class="{ sideViewOpening }">
+		<XWidgets/>
+	</div>
 
 	<XCommon/>
 </div>
@@ -111,25 +133,29 @@
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent } from 'vue';
-import { faLayerGroup, faBars, faHome, faCircle, faWindowMaximize, faColumns, faPencilAlt, faShareAlt, faSatelliteDish, faListUl, faSatellite, faCog, faSearch, faPlus } from '@fortawesome/free-solid-svg-icons';
-import { faBell } from '@fortawesome/free-regular-svg-icons';
-import { instanceName } from '@/config';
+import { faLayerGroup, faBars, faHome, faCircle, faWindowMaximize, faColumns, faPencilAlt, faShareAlt, faSatelliteDish, faListUl, faSatellite, faCog, faSearch, faPlus, faStar, faAt, faLink, faEllipsisH, faGlobe } from '@fortawesome/free-solid-svg-icons';
+import { faBell, faStar as farStar, faEnvelope, faComments, faCalendarAlt } from '@fortawesome/free-regular-svg-icons';
+import { instanceName, url } from '@/config';
 import XSidebar from '@/components/sidebar.vue';
+import XWidgets from './widgets.vue';
 import XCommon from '../_common_/common.vue';
 import XSide from './side.vue';
 import XTimeline from './timeline.vue';
-import XPostForm from './post-form.vue';
 import XHeaderClock from './header-clock.vue';
 import * as os from '@/os';
+import { router } from '@/router';
 import { sidebarDef } from '@/sidebar';
+import { search } from '@/scripts/search';
+import copyToClipboard from '@/scripts/copy-to-clipboard';
+import { store } from './store';
 
 export default defineComponent({
 	components: {
 		XCommon,
 		XSidebar,
+		XWidgets,
 		XSide, // NOTE: dynamic importするとAsyncComponentWrapperが間に入るせいでref取得できなくて面倒になる
 		XTimeline,
-		XPostForm,
 		XHeaderClock,
 	},
 
@@ -160,18 +186,31 @@ export default defineComponent({
 
 	data() {
 		return {
-			tl: 'home',
+			tl: store.state.tl,
 			lists: null,
 			antennas: null,
 			followedChannels: null,
 			featuredChannels: null,
 			currentChannel: null,
 			menuDef: sidebarDef,
-			faLayerGroup, faBars, faBell, faHome, faCircle, faPencilAlt, faShareAlt, faSatelliteDish, faListUl, faSatellite, faCog, faSearch, faPlus,
+			sideViewOpening: false,
+			instanceName,
+			faLayerGroup, faBars, faBell, faHome, faCircle, faPencilAlt, faShareAlt, faSatelliteDish, faListUl, faSatellite, faCog, faSearch, faPlus, faStar, farStar, faAt, faLink, faEllipsisH, faGlobe, faComments, faEnvelope, faCalendarAlt,
 		};
 	},
 
 	created() {
+		if (window.innerWidth < 1024) {
+			localStorage.setItem('ui', 'default');
+			location.reload();
+		}
+
+		router.beforeEach((to, from) => {
+			this.$refs.side.navigate(to.fullPath);
+			// search?q=foo のようなクエリを受け取れるようにするため、return falseはできない
+			//return false;
+		});
+
 		os.api('users/lists/list').then(lists => {
 			this.lists = lists;
 		});
@@ -180,11 +219,12 @@ export default defineComponent({
 			this.antennas = antennas;
 		});
 
-		os.api('channels/followed').then(channels => {
+		os.api('channels/followed', { limit: 20 }).then(channels => {
 			this.followedChannels = channels;
 		});
 
-		os.api('channels/featured').then(channels => {
+		// TODO: pagination
+		os.api('channels/featured', { limit: 20 }).then(channels => {
 			this.featuredChannels = channels;
 		});
 
@@ -194,6 +234,7 @@ export default defineComponent({
 					this.currentChannel = channel;
 				});
 			}
+			store.set('tl', this.tl);
 		}, { immediate: true });
 	},
 
@@ -206,8 +247,57 @@ export default defineComponent({
 			os.post();
 		},
 
+		async timetravel() {
+			const { canceled, result: date } = await os.dialog({
+				title: this.$ts.date,
+				input: {
+					type: 'date'
+				}
+			});
+			if (canceled) return;
+
+			this.$refs.tl.timetravel(new Date(date));
+		},
+
+		search() {
+			search();
+		},
+
+		async inChannelSearch() {
+			const { canceled, result: query } = await os.dialog({
+				title: this.$ts.inChannelSearch,
+				input: true
+			});
+			if (canceled || query == null || query === '') return;
+			router.push(`/search?q=${encodeURIComponent(query)}&channel=${this.currentChannel.id}`);
+		},
+
 		top() {
 			window.scroll({ top: 0, behavior: 'smooth' });
+		},
+
+		async toggleChannelFollow() {
+			if (this.currentChannel.isFollowing) {
+				await os.apiWithDialog('channels/unfollow', {
+					channelId: this.currentChannel.id
+				});
+				this.currentChannel.isFollowing = false;
+			} else {
+				await os.apiWithDialog('channels/follow', {
+					channelId: this.currentChannel.id
+				});
+				this.currentChannel.isFollowing = true;
+			}
+		},
+
+		openChannelMenu(ev) {
+			os.modalMenu([{
+				text: this.$ts.copyUrl,
+				icon: faLink,
+				action: () => {
+					copyToClipboard(`${url}/channels/${this.currentChannel.id}`);
+				}
+			}], ev.currentTarget || ev.target);
 		},
 
 		onTransition() {
@@ -256,8 +346,7 @@ export default defineComponent({
 	$ui-font-size: 1em; // TODO: どこかに集約したい
 
 	// ほんとは単に 100vh と書きたいところだが... https://css-tricks.com/the-trick-to-viewport-units-on-mobile/
-	min-height: calc(var(--vh, 1vh) * 100);
-	box-sizing: border-box;
+	height: calc(var(--vh, 1vh) * 100);
 	display: flex;
 
 	> .nav {
@@ -270,11 +359,11 @@ export default defineComponent({
 		> .header, > .footer {
 			$padding: 8px;
 			display: flex;
+			align-items: center;
 			z-index: 1000;
 			height: $header-height;
 			padding: $padding;
 			box-sizing: border-box;
-			line-height: ($header-height - ($padding * 2));
 			user-select: none;
 
 			&.header {
@@ -287,14 +376,27 @@ export default defineComponent({
 
 			> .left, > .right {
 				> .item, > .menu {
+					display: inline-block;
+					vertical-align: middle;
 					height: ($header-height - ($padding * 2));
 					width: ($header-height - ($padding * 2));
-					padding: 10px;
 					box-sizing: border-box;
-					margin-right: 4px;
 					//opacity: 0.6;
 					position: relative;
-					line-height: initial;
+					border-radius: 5px;
+
+					&:hover {
+						background: rgba(0, 0, 0, 0.05);
+					}
+
+					> .icon {
+						position: absolute;
+						top: 0;
+						left: 0;
+						right: 0;
+						bottom: 0;
+						margin: auto;
+					}
 
 					> i {
 						position: absolute;
@@ -309,6 +411,9 @@ export default defineComponent({
 			}
 
 			> .left {
+				flex: 1;
+				min-width: 0;
+
 				> .account {
 					display: flex;
 					align-items: center;
@@ -318,6 +423,13 @@ export default defineComponent({
 						width: 26px;
 						height: 26px;
 						margin-right: 8px;
+					}
+
+					> .text {
+						white-space: nowrap;
+						overflow: hidden;
+						text-overflow: ellipsis;
+						font-size: 0.9em;
 					}
 				}
 			}
@@ -330,10 +442,12 @@ export default defineComponent({
 		> .body {
 			flex: 1;
 			min-width: 0;
-			padding: 8px 0;
 			overflow: auto;
 
 			> .container {
+				margin-top: 8px;
+				margin-bottom: 8px;
+
 				& + .container {
 					margin-top: 16px;
 				}
@@ -342,10 +456,21 @@ export default defineComponent({
 					display: flex;
 					font-size: 0.9em;
 					padding: 8px 16px;
-					opacity: 0.7;
+					position: sticky;
+					top: 0;
+					background: var(--X17);
+					-webkit-backdrop-filter: blur(8px);
+					backdrop-filter: blur(8px);
+					z-index: 1;
+					color: var(--fgTransparentWeak);
 
 					> .add {
 						margin-left: auto;
+						color: var(--fgTransparentWeak);
+
+						&:hover {
+							color: var(--fg);
+						}
 					}
 				}
 
@@ -356,6 +481,9 @@ export default defineComponent({
 						display: block;
 						padding: 6px 8px;
 						border-radius: 4px;
+						white-space: nowrap;
+						overflow: hidden;
+						text-overflow: ellipsis;
 
 						&:hover {
 							text-decoration: none;
@@ -364,11 +492,11 @@ export default defineComponent({
 
 						&.active, &.active:hover {
 							background: var(--accent);
-							color: #fff;
+							color: #fff !important;
 						}
 
 						&.read {
-							opacity: 0.5;
+							color: var(--fgTransparent);
 						}
 
 						> .icon {
@@ -397,13 +525,13 @@ export default defineComponent({
 			height: $header-height;
 			padding: $padding;
 			box-sizing: border-box;
-			line-height: ($header-height - ($padding * 2));
 			background-color: var(--panel);
 			border-bottom: solid 1px var(--divider);
 			user-select: none;
 
 			> .left {
 				display: flex;
+				align-items: center;
 				flex: 1;
 				min-width: 0;
 
@@ -416,61 +544,68 @@ export default defineComponent({
 					opacity: 0.6;
 				}
 
-				> .title, > .description {
+				> .title {
 					overflow: hidden;
 					text-overflow: ellipsis;
 					white-space: nowrap;
 					min-width: 0;
-				}
-
-				> .title {
-					flex-shrink: 0;
 					font-weight: bold;
-				}
 
-				> .description {
-					margin-left: 16px;
-					opacity: 0.7;
-					font-size: 0.9em;
+					> .description {
+						opacity: 0.6;
+						font-size: 0.8em;
+						font-weight: normal;
+						white-space: nowrap;
+						overflow: hidden;
+						text-overflow: ellipsis;
+					}
 				}
 			}
 
 			> .right {
 				display: flex;
+				align-items: center;
 				min-width: 0;
 				margin-left: auto;
 				padding-left: 8px;
 
-				> .search {
+				> .instance {
+					margin-right: 16px;
+					font-size: 0.9em;
+				}
+
+				> .clock {
+					margin-right: 16px;
+				}
+
+				> .button {
 					height: ($header-height - ($padding * 2));
 					width: ($header-height - ($padding * 2));
-					padding: 10px;
 					box-sizing: border-box;
-					margin-left: 8px;
 					position: relative;
-					line-height: initial;
 					border-radius: 5px;
 
 					&:hover {
 						background: rgba(0, 0, 0, 0.05);
 					}
+
+					&.follow.followed {
+						color: var(--accent);
+					}
 				}
 			}
-		}
-
-		> .footer {
-			padding: 0 16px 16px 16px;
-		}
-
-		> .body {
-			flex: 1;
-			min-width: 0;
-			overflow: auto;
 		}
 	}
 
 	> .side {
+		width: 350px;
 		border-left: solid 1px var(--divider);
+
+		&.widgets.sideViewOpening {
+			@media (max-width: 1400px) {
+				display: none;
+			}
+		}
 	}
 }
 </style>
