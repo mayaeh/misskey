@@ -11,14 +11,19 @@
 
 'use strict';
 
+window.onerror = (e) => {
+	document.documentElement.innerHTML = '問題が発生しました。';
+};
+
 // ブロックの中に入れないと、定義した変数がブラウザのグローバルスコープに登録されてしまい邪魔なので
 (async () => {
 	const v = localStorage.getItem('v') || VERSION;
 
 	//#region Detect language & fetch translations
-	if (localStorage.hasOwnProperty('locale')) {
-		// TODO: 非同期でlocaleの更新処理をする
-	} else {
+	const localeVersion = localStorage.getItem('localeVersion');
+	const localeOutdated = (localeVersion == null || localeVersion !== v);
+
+	if (!localStorage.hasOwnProperty('locale') || localeOutdated) {
 		const supportedLangs = LANGS;
 		let lang = localStorage.getItem('lang');
 		if (lang == null || !supportedLangs.includes(lang)) {
@@ -35,6 +40,7 @@
 		const res = await fetch(`/assets/locales/${lang}.${v}.json`);
 		localStorage.setItem('lang', lang);
 		localStorage.setItem('locale', await res.text());
+		localStorage.setItem('localeVersion', v);
 	}
 	//#endregion
 
