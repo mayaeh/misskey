@@ -71,7 +71,11 @@ export default define(meta, async (ps, user) => {
 
 	const query = makePaginationQuery(Notes.createQueryBuilder('note'), ps.sinceId, ps.untilId)
 		.andWhere(`note.id IN (${ clipQuery.getQuery() })`)
-		.leftJoinAndSelect('note.user', 'user')
+		.innerJoinAndSelect('note.user', 'user')
+		.innerJoinAndSelect('note.reply', 'reply')
+		.innerJoinAndSelect('note.renote', 'renote')
+		.innerJoinAndSelect('reply.user', 'replyUser')
+		.innerJoinAndSelect('renote.user', 'renoteUser')
 		.setParameters(clipQuery.getParameters());
 
 	if (user) {
