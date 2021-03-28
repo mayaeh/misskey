@@ -1,5 +1,5 @@
 import $ from 'cafy';
-import { ID } from '../../../../misc/cafy-id';
+import { ID } from '@/misc/cafy-id';
 import define from '../../define';
 import { Notes } from '../../../../models';
 import { makePaginationQuery } from '../../common/make-pagination-query';
@@ -60,10 +60,10 @@ export default define(meta, async (ps, user) => {
 	const query = makePaginationQuery(Notes.createQueryBuilder('note'), ps.sinceId, ps.untilId)
 		.andWhere('note.replyId = :replyId', { replyId: ps.noteId })
 		.innerJoinAndSelect('note.user', 'user')
-		.innerJoinAndSelect('note.reply', 'reply')
-		.innerJoinAndSelect('note.renote', 'renote')
-		.innerJoinAndSelect('reply.user', 'replyUser')
-		.innerJoinAndSelect('renote.user', 'renoteUser');
+		.leftJoinAndSelect('note.reply', 'reply')
+		.leftJoinAndSelect('note.renote', 'renote')
+		.leftJoinAndSelect('reply.user', 'replyUser')
+		.leftJoinAndSelect('renote.user', 'renoteUser');
 
 	generateVisibilityQuery(query, user);
 	if (user) generateMutedUserQuery(query, user);

@@ -1,7 +1,7 @@
 import $ from 'cafy';
-import { ID } from '../../../../misc/cafy-id';
+import { ID } from '@/misc/cafy-id';
 import define from '../../define';
-import { fetchMeta } from '../../../../misc/fetch-meta';
+import { fetchMeta } from '@/misc/fetch-meta';
 import { ApiError } from '../../error';
 import { makePaginationQuery } from '../../common/make-pagination-query';
 import { Notes } from '../../../../models';
@@ -80,10 +80,10 @@ export default define(meta, async (ps, user) => {
 		.andWhere('note.visibility = \'public\'')
 		.andWhere('note.channelId IS NULL')
 		.innerJoinAndSelect('note.user', 'user')
-		.innerJoinAndSelect('note.reply', 'reply')
-		.innerJoinAndSelect('note.renote', 'renote')
-		.innerJoinAndSelect('reply.user', 'replyUser')
-		.innerJoinAndSelect('renote.user', 'renoteUser');
+		.leftJoinAndSelect('note.reply', 'reply')
+		.leftJoinAndSelect('note.renote', 'renote')
+		.leftJoinAndSelect('reply.user', 'replyUser')
+		.leftJoinAndSelect('renote.user', 'renoteUser');
 
 	generateRepliesQuery(query, user);
 	if (user) generateMutedUserQuery(query, user);

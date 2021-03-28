@@ -1,5 +1,5 @@
 import $ from 'cafy';
-import { ID } from '../../../misc/cafy-id';
+import { ID } from '@/misc/cafy-id';
 import define from '../define';
 import { makePaginationQuery } from '../common/make-pagination-query';
 import { Notes } from '../../../models';
@@ -77,10 +77,10 @@ export default define(meta, async (ps) => {
 		.andWhere(`note.visibility = 'public'`)
 		.andWhere(`note.localOnly = FALSE`)
 		.innerJoinAndSelect('note.user', 'user')
-		.innerJoinAndSelect('note.reply', 'reply')
-		.innerJoinAndSelect('note.renote', 'renote')
-		.innerJoinAndSelect('reply.user', 'replyUser')
-		.innerJoinAndSelect('renote.user', 'renoteUser');
+		.leftJoinAndSelect('note.reply', 'reply')
+		.leftJoinAndSelect('note.renote', 'renote')
+		.leftJoinAndSelect('reply.user', 'replyUser')
+		.leftJoinAndSelect('renote.user', 'renoteUser');
 
 	if (ps.local) {
 		query.andWhere('note.userHost IS NULL');

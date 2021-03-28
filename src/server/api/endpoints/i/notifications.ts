@@ -1,5 +1,5 @@
 import $ from 'cafy';
-import { ID } from '../../../../misc/cafy-id';
+import { ID } from '@/misc/cafy-id';
 import { readNotification } from '../../common/read-notification';
 import define from '../../define';
 import { makePaginationQuery } from '../../common/make-pagination-query';
@@ -87,11 +87,11 @@ export default define(meta, async (ps, user) => {
 		.andWhere(`notification.notifieeId = :meId`, { meId: user.id })
 		.leftJoinAndSelect('notification.notifier', 'notifier')
 		.leftJoinAndSelect('notification.note', 'note')
-		.innerJoinAndSelect('note.user', 'user')
-		.innerJoinAndSelect('note.reply', 'reply')
-		.innerJoinAndSelect('note.renote', 'renote')
-		.innerJoinAndSelect('reply.user', 'replyUser')
-		.innerJoinAndSelect('renote.user', 'renoteUser');
+		.leftJoinAndSelect('note.user', 'user')
+		.leftJoinAndSelect('note.reply', 'reply')
+		.leftJoinAndSelect('note.renote', 'renote')
+		.leftJoinAndSelect('reply.user', 'replyUser')
+		.leftJoinAndSelect('renote.user', 'renoteUser');
 
 	query.andWhere(`notification.notifierId NOT IN (${ mutingQuery.getQuery() })`);
 	query.setParameters(mutingQuery.getParameters());
