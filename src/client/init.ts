@@ -4,7 +4,7 @@
 
 import '@client/style.scss';
 
-import { createApp, watch } from 'vue';
+import { computed, createApp, watch } from 'vue';
 import widgets from '@client/widgets';
 import directives from '@client/directives';
 import components from '@client/components';
