@@ -132,7 +132,6 @@
 
 <script lang="ts">
 import { defineAsyncComponent, defineComponent } from 'vue';
-import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import FormSwitch from '@client/components/form/switch.vue';
 import FormSelect from '@client/components/form/select.vue';
 import FormLink from '@client/components/form/link.vue';
@@ -143,6 +142,7 @@ import FormKeyValueView from '@client/components/form/key-value-view.vue';
 import * as os from '@client/os';
 import number from '@client/filters/number';
 import bytes from '@client/filters/bytes';
+import * as symbols from '@client/symbols';
 
 export default defineComponent({
 	components: {
@@ -159,16 +159,16 @@ export default defineComponent({
 	
 	data() {
 		return {
-			INFO: {
+			[symbols.PAGE_INFO]: {
 				title: this.$ts.accountInfo,
-				icon: faInfoCircle
+				icon: 'fas fa-info-circle'
 			},
 			stats: null
 		}
 	},
 
 	mounted() {
-		this.$emit('info', this.INFO);
+		this.$emit('info', this[symbols.PAGE_INFO]);
 
 		os.api('users/stats', {
 			userId: this.$i.id

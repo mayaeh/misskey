@@ -6,7 +6,7 @@ import acceptAllFollowRequests from '../../../../services/following/requests/acc
 import { publishToFollowers } from '../../../../services/i/update';
 import define from '../../define';
 import { extractCustomEmojisFromMfm } from '@/misc/extract-custom-emojis-from-mfm';
-import extractHashtags from '@/misc/extract-hashtags';
+import { extractHashtags } from '@/misc/extract-hashtags';
 import * as langmap from 'langmap';
 import { updateUsertags } from '../../../../services/update-hashtag';
 import { ApiError } from '../../error';
@@ -93,6 +93,10 @@ export const meta = {
 		},
 
 		isExplorable: {
+			validator: $.optional.bool,
+		},
+
+		hideOnlineStatus: {
 			validator: $.optional.bool,
 		},
 
@@ -228,6 +232,7 @@ export default define(meta, async (ps, _user, token) => {
 	if (ps.mutingNotificationTypes !== undefined) profileUpdates.mutingNotificationTypes = ps.mutingNotificationTypes as typeof notificationTypes[number][];
 	if (typeof ps.isLocked === 'boolean') updates.isLocked = ps.isLocked;
 	if (typeof ps.isExplorable === 'boolean') updates.isExplorable = ps.isExplorable;
+	if (typeof ps.hideOnlineStatus === 'boolean') updates.hideOnlineStatus = ps.hideOnlineStatus;
 	if (typeof ps.isBot === 'boolean') updates.isBot = ps.isBot;
 	if (typeof ps.carefulBot === 'boolean') profileUpdates.carefulBot = ps.carefulBot;
 	if (typeof ps.autoAcceptFollowed === 'boolean') profileUpdates.autoAcceptFollowed = ps.autoAcceptFollowed;

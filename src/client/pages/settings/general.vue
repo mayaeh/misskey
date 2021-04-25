@@ -1,6 +1,5 @@
 <template>
 <FormBase>
-	<FormSwitch v-model:value="titlebar">{{ $ts.showTitlebar }}</FormSwitch>
 	<FormSwitch v-model:value="showFixedPostForm">{{ $ts.showFixedPostForm }}</FormSwitch>
 
 	<FormSelect v-model:value="lang">
@@ -84,7 +83,6 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { faImage, faCog, faColumns, faCogs } from '@fortawesome/free-solid-svg-icons';
 import FormSwitch from '@client/components/form/switch.vue';
 import FormSelect from '@client/components/form/select.vue';
 import FormRadios from '@client/components/form/radios.vue';
@@ -98,6 +96,7 @@ import { defaultStore } from '@client/store';
 import { ColdDeviceStorage } from '@client/store';
 import * as os from '@client/os';
 import { unisonReload } from '@client/scripts/unison-reload';
+import * as symbols from '@client/symbols';
 
 export default defineComponent({
 	components: {
@@ -115,15 +114,14 @@ export default defineComponent({
 
 	data() {
 		return {
-			INFO: {
+			[symbols.PAGE_INFO]: {
 				title: this.$ts.general,
-				icon: faCogs
+				icon: 'fas fa-cogs'
 			},
 			langs,
 			lang: localStorage.getItem('lang'),
 			fontSize: localStorage.getItem('fontSize'),
 			useSystemFont: localStorage.getItem('useSystemFont') != null,
-			faImage, faCog, faColumns
 		}
 	},
 
@@ -136,7 +134,6 @@ export default defineComponent({
 		useOsNativeEmojis: defaultStore.makeGetterSetter('useOsNativeEmojis'),
 		disableShowingAnimatedImages: defaultStore.makeGetterSetter('disableShowingAnimatedImages'),
 		loadRawImages: defaultStore.makeGetterSetter('loadRawImages'),
-		titlebar: defaultStore.makeGetterSetter('titlebar'),
 		imageNewTab: defaultStore.makeGetterSetter('imageNewTab'),
 		nsfw: defaultStore.makeGetterSetter('nsfw'),
 		disablePagesScript: defaultStore.makeGetterSetter('disablePagesScript'),
@@ -181,17 +178,13 @@ export default defineComponent({
 			this.reloadAsk();
 		},
 
-		titlebar() {
-			this.reloadAsk();
-		},
-
 		instanceTicker() {
 			this.reloadAsk();
 		},
 	},
 
 	mounted() {
-		this.$emit('info', this.INFO);
+		this.$emit('info', this[symbols.PAGE_INFO]);
 	},
 
 	methods: {

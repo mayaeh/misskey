@@ -8,7 +8,6 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { faKey } from '@fortawesome/free-solid-svg-icons';
 import FormSwitch from '@client/components/form/switch.vue';
 import FormSelect from '@client/components/form/select.vue';
 import FormLink from '@client/components/form/link.vue';
@@ -16,6 +15,7 @@ import FormBase from '@client/components/form/base.vue';
 import FormGroup from '@client/components/form/group.vue';
 import FormButton from '@client/components/form/button.vue';
 import * as os from '@client/os';
+import * as symbols from '@client/symbols';
 
 export default defineComponent({
 	components: {
@@ -28,16 +28,16 @@ export default defineComponent({
 
 	data() {
 		return {
-			INFO: {
+			[symbols.PAGE_INFO]: {
 				title: 'API',
-				icon: faKey
+				icon: 'fas fa-key'
 			},
 			isDesktop: window.innerWidth >= 1100,
 		};
 	},
 
 	mounted() {
-		this.$emit('info', this.INFO);
+		this.$emit('info', this[symbols.PAGE_INFO]);
 	},
 
 	methods: {

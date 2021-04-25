@@ -11,14 +11,13 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { faCog } from '@fortawesome/free-solid-svg-icons';
-import { faBell } from '@fortawesome/free-regular-svg-icons';
 import FormButton from '@client/components/form/button.vue';
 import FormLink from '@client/components/form/link.vue';
 import FormBase from '@client/components/form/base.vue';
 import FormGroup from '@client/components/form/group.vue';
 import { notificationTypes } from '../../../types';
 import * as os from '@client/os';
+import * as symbols from '@client/symbols';
 
 export default defineComponent({
 	components: {
@@ -32,16 +31,15 @@ export default defineComponent({
 	
 	data() {
 		return {
-			INFO: {
+			[symbols.PAGE_INFO]: {
 				title: this.$ts.notifications,
-				icon: faBell
+				icon: 'fas fa-bell'
 			},
-			faCog
 		}
 	},
 
 	mounted() {
-		this.$emit('info', this.INFO);
+		this.$emit('info', this[symbols.PAGE_INFO]);
 	},
 
 	methods: {
